@@ -693,7 +693,8 @@ class Parser {
       const left = this.parseFunctionCall(startIndex, tokens);
       return this.continueParsing(left.expression, left.nextStartIndex, tokens);
     } else if (token.isOpeningBracket()) {
-      return this.parseBrackets(startIndex, tokens);
+      const left = this.parseBrackets(startIndex, tokens);
+      return this.continueParsing(left.expression, left.nextStartIndex, tokens);
     } else {
       throw new Error(`Expression cannot start with ${token.text}`);
     }
@@ -810,7 +811,23 @@ class Parser {
    *
    * @returns {ParsingResult}
    */
-  parseBrackets(startIndex, tokens) {}
+  parseBrackets(startIndex, tokens) {
+    // Add 1 to skip opening bracket.
+    const right = this.parse(startIndex + 1, tokens);
+    if (right) {
+      if (
+        right.nextStartIndex >= tokens.length ||
+        !tokens[right.nextStartIndex].isClosingBracket()
+      ) {
+        throw new Error("Unmatched brackets.");
+      } else {
+        // Add 1 to skip closing bracket.
+        return new ParsingResult(right.expression, right.nextStartIndex + 1);
+      }
+    } else {
+      throw new Error("Unmatched brackets.");
+    }
+  }
 
   /**
    *
@@ -819,7 +836,20 @@ class Parser {
    *
    * @returns {ParsingResult}
    */
-  parseFunctionCall(startIndex, tokens) {}
+  parseFunctionCall(startIndex, tokens) {
+    // f(x) has 4 tokens at minumum
+    if (startIndex + 4 >= tokens.length) {
+      throw new Error("Invalid function call.");
+    }
+
+    const arg = this.parseBrackets(startIndex + 1, tokens);
+    const funcCallExpression = Expression.buildFunctionCallExpression(
+      tokens[startIndex],
+      arg.expression
+    );
+
+    return new ParsingResult(funcCallExpression, arg.nextStartIndex);
+  }
 
   /**
    * Returns the first operator token from given index.
@@ -843,6 +873,6 @@ class Parser {
 }
 
 const parser = new Parser(new Tokeniser());
-const ret = parser.parse(0, parser.tokeniser.tokenise("-7!", []));
+const ret = parser.parse(0, parser.tokeniser.tokenise("(1/999999999.999)*999999999.999", []));
 console.log(ret.expression.debug());
 console.log(ret.expression.eval(new SymbolsTable([], [])));
