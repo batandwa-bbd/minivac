@@ -344,17 +344,31 @@ class SymbolsTable {
    */
   setSymbol(symbolName, value) {
     if (value instanceof Expression) {
+      let exists = false;
+
       this.callables.forEach((callable) => {
         if (callable.name === symbolName) {
           callable.setTo(value);
+          exists = true;
         }
       });
+
+      if (!exists) {
+        this.callables.push(new Callable(symbolName, value, false));
+      }
     } else {
+      let exists = false;
+
       this.variables.forEach((variable) => {
         if (variable.name === symbolName) {
           variable.setTo(value);
+          exists = true;
         }
       });
+
+      if (!exists) {
+        this.variables.push(new Variable(symbolName, value, false));
+      }
     }
   }
 
@@ -372,6 +386,21 @@ class SymbolsTable {
       throw new Error(`${name} is not a stored variable`);
     }
   }
+
+  /**
+   *
+   * @param {string} name
+   *
+   * @returns {Callable}
+   */
+  getCallable(name) {
+    const out = this.callables.filter((callable) => callable.name === name);
+    if (out.length > 0) {
+      return out[0];
+    } else {
+      throw new Error(`${name} is not a stored function`);
+    }
+  }
 }
 
 class Expression {
@@ -385,9 +414,9 @@ class Expression {
   }
 
   /**
-   * 
+   *
    * @param {SymbolsTable} symbolsTable
-   * 
+   *
    * @returns {string}
    */
   debug(symbolsTable) {
@@ -617,7 +646,7 @@ class FunctionCallExpression extends Expression {
     const argValue = this.argument.eval(symbolsTable);
     symbolsTable.setSymbol("x", argValue);
     const funcExpression = symbolsTable
-      .getVariable(this.functionName)
+      .getCallable(this.functionName)
       .asExpression();
 
     return funcExpression.eval(symbolsTable);
@@ -739,8 +768,6 @@ class Parser {
 
     const token = tokens[startIndex];
 
-    const c = token.isOperator();
-    const d = token.isBinaryOperator();
     if (token.isOperator() || token.isClosingBracket()) {
       if (token.isClosingBracket()) {
         return new ParsingResult(leftExpression, startIndex);
@@ -849,13 +876,13 @@ class Parser {
    */
   parseFunctionCall(startIndex, tokens) {
     // f(x) has 4 tokens at minumum
-    if (startIndex + 4 >= tokens.length) {
+    if (startIndex + 3 >= tokens.length) {
       throw new Error("Invalid function call.");
     }
 
     const arg = this.parseBrackets(startIndex + 1, tokens);
     const funcCallExpression = Expression.buildFunctionCallExpression(
-      tokens[startIndex],
+      tokens[startIndex].text,
       arg.expression
     );
 
@@ -883,10 +910,37 @@ class Parser {
   }
 }
 
+class SinExp extends Expression {
+  /**
+   *
+   * @param {SymbolsTable} symbolsTable
+   */
+  eval(symbolsTable) {
+    return Math.sin(this.getXValue(symbolsTable));
+  }
+
+  debug(symbolsTable) {
+    return `sin(${this.getXValue(symbolsTable)})`;
+  }
+
+  /**
+   * @param {SymbolsTable} symbolsTable
+   */
+  getXValue(symbolsTable) {
+    return symbolsTable.getVariable("x").asNumber();
+  }
+}
+
+class SinCallable extends Callable {
+  constructor() {
+    super("sin", new SinExp(), true);
+  }
+}
+
 const parser = new Parser(new Tokeniser());
 const ret = parser.parse(
   0,
-  parser.tokeniser.tokenise("1E-26*2", [])
+  parser.tokeniser.tokenise("sin(3.14159)*3000", ["sin"])
 );
-console.log(ret.expression.debug());
-console.log(ret.expression.eval(new SymbolsTable([], [])));
+// console.log(ret.expression.debug());
+console.log(ret.expression.eval(new SymbolsTable([], [new SinCallable()])));
