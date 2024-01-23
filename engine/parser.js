@@ -5,6 +5,7 @@ const OperatorTokenTypes = {
   OperatorMultiply: "opMul",
   OperatorPower: "opPow",
   OperatorFactorial: "opFact",
+  OperatorScientific: "opScientific",
 
   // Treating function calls as operators.
   OperatorFunctionCall: "opFuncCall",
@@ -27,6 +28,7 @@ const OperatorPrecedence = new Map();
 OperatorPrecedence.set(OperatorTokenTypes.OperatorFunctionCall, 110);
 OperatorPrecedence.set(OperatorTokenTypes.OperatorFactorial, 100);
 OperatorPrecedence.set(OperatorTokenTypes.OperatorPower, 90);
+OperatorPrecedence.set(OperatorTokenTypes.OperatorScientific, 90);
 OperatorPrecedence.set(OperatorTokenTypes.OperatorDivide, 80);
 OperatorPrecedence.set(OperatorTokenTypes.OperatorMultiply, 70);
 OperatorPrecedence.set(OperatorTokenTypes.OperatorAdd, 60);
@@ -40,6 +42,7 @@ OperatorType.set(OperatorTokenTypes.OperatorDivide, "binary");
 OperatorType.set(OperatorTokenTypes.OperatorMultiply, "binary");
 OperatorType.set(OperatorTokenTypes.OperatorAdd, "binary");
 OperatorType.set(OperatorTokenTypes.OperatorSubtract, "binary");
+OperatorType.set(OperatorTokenTypes.OperatorScientific, "binary");
 
 class Token {
   /**
@@ -161,7 +164,7 @@ class Tokeniser {
   _getMatchers() {
     const out = new Map();
     out.set(/^\d+(\.\d+)?/, TokenType.UnsignedNumber);
-    out.set(/^[a-zA-Z]+/, TokenType.Identifier);
+    out.set(/^[a-z]+/, TokenType.Identifier);
     out.set(/^\(/, TokenType.PuncOpeningBracket);
     out.set(/^\)/, TokenType.PuncClosingBracket);
 
@@ -171,6 +174,7 @@ class Tokeniser {
     out.set(/^\//, TokenType.OperatorDivide);
     out.set(/^!/, TokenType.OperatorFactorial);
     out.set(/^\^/, TokenType.OperatorPower);
+    out.set(/^\E/, TokenType.OperatorScientific);
 
     return out;
   }
@@ -381,9 +385,12 @@ class Expression {
   }
 
   /**
+   * 
+   * @param {SymbolsTable} symbolsTable
+   * 
    * @returns {string}
    */
-  debug() {
+  debug(symbolsTable) {
     throw new Error("Unimplemented method.");
   }
 
@@ -511,6 +518,8 @@ class BinaryExpression extends Expression {
         return this.guidedDivide(leftVal, rightVal);
       case "^":
         return Math.pow(leftVal, rightVal);
+      case "E":
+        return leftVal * Math.pow(10, rightVal);
     }
 
     return -1;
@@ -730,6 +739,8 @@ class Parser {
 
     const token = tokens[startIndex];
 
+    const c = token.isOperator();
+    const d = token.isBinaryOperator();
     if (token.isOperator() || token.isClosingBracket()) {
       if (token.isClosingBracket()) {
         return new ParsingResult(leftExpression, startIndex);
@@ -873,6 +884,9 @@ class Parser {
 }
 
 const parser = new Parser(new Tokeniser());
-const ret = parser.parse(0, parser.tokeniser.tokenise("(1/999999999.999)*999999999.999", []));
+const ret = parser.parse(
+  0,
+  parser.tokeniser.tokenise("1E-26*2", [])
+);
 console.log(ret.expression.debug());
 console.log(ret.expression.eval(new SymbolsTable([], [])));
