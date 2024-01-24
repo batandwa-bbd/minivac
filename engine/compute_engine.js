@@ -1,10 +1,137 @@
-import { Parser, SymbolsTable, Tokeniser, Variable } from "./parser.js";
+import {
+  Callable,
+  Expression,
+  Parser,
+  SymbolsTable,
+  Tokeniser,
+  Variable,
+} from "./parser.js";
+
+class SinExpr extends Expression {
+  eval(symbolsTable) {
+    const x = this.getXValue(symbolsTable);
+    return Math.sin(x);
+  }
+
+  debug() {
+    return "The sine of x";
+  }
+}
+
+class ASinExpr extends Expression {
+  eval(symbolsTable) {
+    const x = this.getXValue(symbolsTable);
+    return Math.asin(x);
+  }
+
+  debug() {
+    return "The arcsine of x";
+  }
+}
+
+class ASinhExpr extends Expression {
+  eval(symbolsTable) {
+    const x = this.getXValue(symbolsTable);
+    return Math.asinh(x);
+  }
+
+  debug() {
+    return "The hyperbolic arcsine of x";
+  }
+}
+
+class CosExpr extends Expression {
+  eval(symbolsTable) {
+    const x = this.getXValue(symbolsTable);
+    return Math.cos(x);
+  }
+
+  debug() {
+    return "The cosine of x";
+  }
+}
+
+class ACosExpr extends Expression {
+  eval(symbolsTable) {
+    const x = this.getXValue(symbolsTable);
+    return Math.acos(x);
+  }
+
+  debug() {
+    return "The arccosine of x";
+  }
+}
+
+class ACoshExpr extends Expression {
+  eval(symbolsTable) {
+    const x = this.getXValue(symbolsTable);
+    return Math.acosh(x);
+  }
+
+  debug() {
+    return "The hyperbolic arccosine of x";
+  }
+}
+
+class TanExpr extends Expression {
+  eval(symbolsTable) {
+    const x = this.getXValue(symbolsTable);
+    return Math.tan(x);
+  }
+
+  debug() {
+    return "The tangent of x";
+  }
+}
+
+class ATanExpr extends Expression {
+  eval(symbolsTable) {
+    const x = this.getXValue(symbolsTable);
+    return Math.atan(x);
+  }
+
+  debug() {
+    return "The arctangent of x";
+  }
+}
+
+class ATanhExpr extends Expression {
+  eval(symbolsTable) {
+    const x = this.getXValue(symbolsTable);
+    return Math.atanh(x);
+  }
+
+  debug() {
+    return "The hyperbolic arctangent of x";
+  }
+}
+
+class DegToRad extends Expression {
+  eval(symbolsTable) {
+    const x = this.getXValue(symbolsTable);
+    return (x * Math.PI) / 180;
+  }
+
+  debug() {
+    return "The angle, x, in radians. All trig functions use radians";
+  }
+}
+
+class RadToDeg extends Expression {
+  eval(symbolsTable) {
+    const x = this.getXValue(symbolsTable);
+    return (x * 180) / Math.PI;
+  }
+
+  debug() {
+    return "The angle, x, in degrees. Some trig expressions will return radians.";
+  }
+}
 
 /**
  * @returns {SymbolsTable}
  */
 function getDefaultSymbolsTable() {
-  // TODO: Add variables and constants
   return new SymbolsTable(
     [
       new Variable("ans", 0, false),
@@ -12,7 +139,22 @@ function getDefaultSymbolsTable() {
 
       new Variable("pi", Math.PI, true),
     ],
-    []
+    [
+      new Callable("sin", new SinExpr(), true),
+      new Callable("asin", new ASinExpr(), true),
+      new Callable("asinh", new ASinhExpr(), true),
+
+      new Callable("cos", new CosExpr(), true),
+      new Callable("acos", new ACosExpr(), true),
+      new Callable("acosh", new ACoshExpr(), true),
+
+      new Callable("tan", new TanExpr(), true),
+      new Callable("atan", new ATanExpr(), true),
+      new Callable("atanh", new ATanhExpr(), true),
+
+      new Callable("rad", new DegToRad(), true),
+      new Callable("deg", new RadToDeg(), true),
+    ]
   );
 }
 

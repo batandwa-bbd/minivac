@@ -320,7 +320,7 @@ export class Variable {
   }
 }
 
-class Callable extends Variable {
+export class Callable extends Variable {
   constructor(name, expression, isFinal) {
     super(name, expression, isFinal);
   }
@@ -421,6 +421,15 @@ export class Expression {
    */
   debug(symbolsTable) {
     throw new Error("Unimplemented method.");
+  }
+
+  /**
+   * @param {SymbolsTable} symbolsTable
+   *
+   * @returns {number}
+   */
+  getXValue(symbolsTable) {
+    return symbolsTable.getVariable("x").asNumber();
   }
 
   /**
