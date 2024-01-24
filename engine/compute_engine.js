@@ -138,6 +138,7 @@ function getDefaultSymbolsTable() {
       new Variable("preans", 0, false),
 
       new Variable("pi", Math.PI, true),
+      new Variable("e", Math.E, true),
     ],
     [
       new Callable("sin", new SinExpr(), true),
