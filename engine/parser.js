@@ -153,7 +153,7 @@ class Token {
   }
 }
 
-class Tokeniser {
+export class Tokeniser {
   /**
    * A matcher is a regex that can match a token type.
    *
@@ -279,7 +279,7 @@ class Tokeniser {
   }
 }
 
-class Variable {
+export class Variable {
   /**
    *
    * @param {string} name
@@ -326,7 +326,7 @@ class Callable extends Variable {
   }
 }
 
-class SymbolsTable {
+export class SymbolsTable {
   /**
    *
    * @param {Array<Variable>} variables
@@ -403,7 +403,7 @@ class SymbolsTable {
   }
 }
 
-class Expression {
+export class Expression {
   /**
    * @param {SymbolsTable} symbolsTable
    *
@@ -670,7 +670,7 @@ class ParsingResult {
   }
 }
 
-class Parser {
+export class Parser {
   /**
    *
    * @param {Tokeniser} tokeniser
@@ -909,38 +909,3 @@ class Parser {
     return null;
   }
 }
-
-class SinExp extends Expression {
-  /**
-   *
-   * @param {SymbolsTable} symbolsTable
-   */
-  eval(symbolsTable) {
-    return Math.sin(this.getXValue(symbolsTable));
-  }
-
-  debug(symbolsTable) {
-    return `sin(${this.getXValue(symbolsTable)})`;
-  }
-
-  /**
-   * @param {SymbolsTable} symbolsTable
-   */
-  getXValue(symbolsTable) {
-    return symbolsTable.getVariable("x").asNumber();
-  }
-}
-
-class SinCallable extends Callable {
-  constructor() {
-    super("sin", new SinExp(), true);
-  }
-}
-
-const parser = new Parser(new Tokeniser());
-const ret = parser.parse(
-  0,
-  parser.tokeniser.tokenise("sin(3.14159)*3000", ["sin"])
-);
-// console.log(ret.expression.debug());
-console.log(ret.expression.eval(new SymbolsTable([], [new SinCallable()])));
