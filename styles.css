@@ -1,21 +1,32 @@
 body {
   width: 100%;
   font-size: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
   section {
-    width: 100%;
+    width: 80%;
 
     input {
-      width: 80%;
+      width: 100%;
       border-radius: 3rem;
       border: 3px solid blue;
       font-size: 2.5rem;
       padding: 1rem;
       text-align: center;
-    }
 
-    ul {
-      width: 80%;
+      animation: widthExpandAnimation 0.5s ease-in-out;
     }
+  }
+}
+
+@keyframes widthExpandAnimation {
+  from {
+    width: 10%;
+  }
+
+  to {
+    width: 100%;
   }
 }
