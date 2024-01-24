@@ -174,7 +174,7 @@ export class Tokeniser {
     out.set(/^\//, TokenType.OperatorDivide);
     out.set(/^!/, TokenType.OperatorFactorial);
     out.set(/^\^/, TokenType.OperatorPower);
-    out.set(/^\E/, TokenType.OperatorScientific);
+    out.set(/^E/, TokenType.OperatorScientific);
 
     return out;
   }
@@ -320,11 +320,7 @@ export class Variable {
   }
 }
 
-export class Callable extends Variable {
-  constructor(name, expression, isFinal) {
-    super(name, expression, isFinal);
-  }
-}
+export class Callable extends Variable {}
 
 export class SymbolsTable {
   /**
@@ -663,7 +659,7 @@ class FunctionCallExpression extends Expression {
 
   debug() {
     const opDebug = this.argument.debug();
-    return `${this.functionName}\(${opDebug}\)`;
+    return `${this.functionName}(${opDebug})`;
   }
 }
 
@@ -676,6 +672,10 @@ class ParsingResult {
   constructor(expression, nextStartIndex) {
     this.expression = expression;
     this.nextStartIndex = nextStartIndex;
+  }
+
+  getExpression() {
+    return this.expression;
   }
 }
 
