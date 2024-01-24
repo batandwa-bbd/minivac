@@ -144,10 +144,18 @@ class Token {
     return this.isOperator() && this.type === TokenType.OperatorFunctionCall;
   }
 
+  /**
+   *
+   * @returns {boolean}
+   */
   isOpeningBracket() {
     return this.type === TokenType.PuncOpeningBracket;
   }
 
+  /**
+   *
+   * @returns {boolean}
+   */
   isClosingBracket() {
     return this.type === TokenType.PuncClosingBracket;
   }
@@ -405,7 +413,7 @@ export class Expression {
    *
    * @returns {number}
    */
-  eval(symbolsTable) {
+  eval(_symbolsTable) {
     throw new Error("Unimplemented method.");
   }
 
@@ -415,7 +423,7 @@ export class Expression {
    *
    * @returns {string}
    */
-  debug(symbolsTable) {
+  debug(_symbolsTable) {
     throw new Error("Unimplemented method.");
   }
 
@@ -592,7 +600,7 @@ class ConstantExpression extends Expression {
     this.value = value;
   }
 
-  eval(symbolsTable) {
+  eval(_symbolsTable) {
     return this.value;
   }
 
