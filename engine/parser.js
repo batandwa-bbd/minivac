@@ -462,7 +462,7 @@ export class Expression {
 
   /**
    *
-   * @param {string} value
+   * @param {string} varName
    *
    * @returns {Expression}
    */
@@ -818,7 +818,7 @@ export class Parser {
     const token = tokens[startIndex];
     if (token.isVariable() || token.isUnsignedNumber()) {
       const operandExpression = token.isVariable()
-        ? Expression.buildVariableExpression(token)
+        ? Expression.buildVariableExpression(token.text)
         : Expression.buildConstantExpression(Number.parseFloat(token.text));
 
       return new ParsingResult(operandExpression, startIndex + 1);
